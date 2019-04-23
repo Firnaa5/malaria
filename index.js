@@ -20,10 +20,9 @@ app.get('/getWithYear', malaria);
 
 function malaria(req, res){	
 		axios.get(reqUrl,{ params:{query: req.query.query,
-			start: req.query.start,
-			end: req.query.end,
+			date: ` FIRST_PDATE:[${req.query.start} TO ${req.query.end}]`,
 			sort: 'CITED desc',
-			pageSize:1,
+			pageSize:10,
 			synonym: true,
 			format: 'json' }})
 		.then(function(response){
@@ -31,9 +30,8 @@ function malaria(req, res){
 			console.log(data);	
 			data.forEach(function(result) {
   				var responseData = {Title: result.title, Author: result.authorString, Year: result.pubYear, Count: result.citedByCount};
-  	 			res.write(JSON.stringify(responseData));  				
-			});
-			res.end();			
+  	 			res.json(responseData);  				
+			});			
 		})
 		.catch(function(err){
 			 res.status(500).json({
