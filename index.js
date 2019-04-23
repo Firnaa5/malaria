@@ -22,19 +22,28 @@ function malaria(req, res){
 		var options ={
 			query: req.query.query,
 			date:`( FIRST_PDATE:[${req.query.start} TO ${req.query.end}])`,
-			sort: 'CITED desc',
-			pageSize:1,
+			sort:'CITED desc',
+			pageSize:100,
 			synonym: true,
 			format: 'json'
 		}
+		var rest ={};
 		request({url:reqUrl, qs:options }, function(err, response, body){
 			console.log(options)
 		if(!err && response.statusCode == 200){
 			var data = JSON.parse(body);
 				data.resultList.result.forEach(function(result) {
-  				var responseData = {title: result.title, author: result.authorString, pubYear: result.pubYear, count: result.citedByCount};
-  				res.send(responseData);  				
-			});			
+					var key = result.pubYear;
+					var responseData = {title: result.title, author: result.authorString, pubYear: result.pubYear, count: result.citedByCount};
+  					if(rest.hasOwnProperty(key)){
+  						rest[key].push(responseData);
+  					} else {
+					rest[key] =[];
+  					rest[key].push(responseData);
+  				}
+  					console.log(responseData) 				
+			});
+			res.status(200).json(rest);			
 		} else {
 			res.status(500).json({
 				content:'Api request failed'
