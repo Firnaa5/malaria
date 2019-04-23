@@ -21,21 +21,20 @@ app.get('/getWithYear', malaria);
 function malaria(req, res){
 		var options ={
 			query: req.query.query,
-			start: req.query.start,
-			end: req.query.end,
+			date:`( FIRST_PDATE:[${req.query.start} TO ${req.query.end}])`,
 			sort: 'CITED desc',
 			pageSize:1,
 			synonym: true,
 			format: 'json'
 		}
 		request({url:reqUrl, qs:options }, function(err, response, body){
+			console.log(options)
 		if(!err && response.statusCode == 200){
 			var data = JSON.parse(body);
 				data.resultList.result.forEach(function(result) {
-  				var responseData = {Title: result.title, Author: result.authorString, Year: result.pubYear, Count: result.citedByCount};
-  				res.write(JSON.stringify(responseData));  				
-			});
-			res.end();			
+  				var responseData = {title: result.title, author: result.authorString, pubYear: result.pubYear, count: result.citedByCount};
+  				res.send(responseData);  				
+			});			
 		} else {
 			res.status(500).json({
 				content:'Api request failed'
