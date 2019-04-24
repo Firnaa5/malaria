@@ -30,7 +30,7 @@ function malaria(req, res){
 			const data = response.data.resultList.result;	
 			data.forEach(function(result) {
 				var key = result.pubYear;				
-  				var responseData = {Title: result.title, Author: result.authorString, Year: result.pubYear, Count: result.citedByCount};
+  				var responseData = {title: result.title, author: result.authorString, year: result.pubYear, count: result.citedByCount};
   				if(rest.hasOwnProperty(key)){
   					rest[key].push(responseData);
   				} else {
