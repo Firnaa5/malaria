@@ -16,38 +16,51 @@ app.listen(PORT, function(req, res){
 	console.log(`Server is running @ ${PORT}`);
 })
 
+var date = new Date();
+var end = format(date);
+
 app.get('/getWithYear', malaria);
 
-
 function malaria(req, res){	
-		axios.get(reqUrl,{ params:{query: req.query.query,
-			date: `( FIRST_PDATE:[${req.query.start} TO ${req.query.end}])`,
-			sort: 'CITED desc',
-			pageSize:100,
-			synonym: true,
-			format: 'json' }})
-		.then(function(response){
-			var rest = {};
-			const data = response.data.resultList.result;	
-			data.forEach(function(result) {
-				var key = result.pubYear;				
-  				var responseData = {title: result.title, author: result.authorString, year: result.pubYear, count: result.citedByCount};
-  				if(rest.hasOwnProperty(key)){
-  					rest[key].push(responseData);
-  				} else {
-  					rest[key] = [];
-  					rest[key].push(responseData);
-  				}  	 			 				
-			});	
-			res.status(200).json(rest); 		
-		})
-		.catch(function(err){
-			 res.status(500).json({
-			 	content:'Api request failed'
-			 })	
-		})
-	}
+	axios.get(reqUrl,{ params:{query: req.query.query,
+		date:`( FIRST_PDATE:[${req.query.start || '1780-01-01'} TO ${req.query.end || end}])`,
+		sort: 'CITED desc',
+		pageSize:10,
+		synonym: true,
+		format: 'json' }})
+	.then(function(response){
+		var rest = {};
+		const data = response.data.resultList.result;	
+		data.forEach(function(result) {
+			var key = result.pubYear;				
+  			var responseData = {title: result.title, author: result.authorString, year: result.pubYear, count: result.citedByCount};
+  			if(rest.hasOwnProperty(key)){
+  				rest[key].push(responseData);
+  			} else {
+  				rest[key] = [];
+  				rest[key].push(responseData);
+  			}  	 			 				
+		});
+		console.log(response)	
+		res.status(200).json(rest); 		
+	})
+	.catch(function(err){
+		res.status(500).json({
+		 	content:'Api request failed'
+		})	
+	})
+}
 
 
 
 
+
+
+//date format function
+
+function format(date) {
+    var d = date.getDate();
+    var m = date.getMonth() + 1;
+    var y = date.getFullYear();
+    return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+}
