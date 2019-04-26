@@ -30,19 +30,21 @@ function malaria(req, res){
 		format: 'json' }})
 	.then(function(response){
 		var rest = {};
-		const data = response.data.resultList.result;	
-		data.forEach(function(result) {
-			var key = result.pubYear;				
-  			var responseData = {title: result.title, author: result.authorString, year: result.pubYear, count: result.citedByCount};
-  			if(rest.hasOwnProperty(key)){
-  				rest[key].push(responseData);
-  			} else {
-  				rest[key] = [];
-  				rest[key].push(responseData);
-  			}  	 			 				
-		});
-		console.log(response)	
-		res.status(200).json(rest); 		
+		if(response && typeof response.data != 'undefined' && typeof response.data.resultList !='undefined' && response.data.resultList.result ) {
+			const data = response.data.resultList.result;	
+			data.forEach(function(result) {
+				var key = result.pubYear;				
+				var responseData = {title: result.title, author: result.authorString, year: result.pubYear, count: result.citedByCount};
+				if(rest.hasOwnProperty(key)){
+					rest[key].push(responseData);
+				} else {
+					rest[key] = [];
+					rest[key].push(responseData);
+				}  	 			 				
+			});
+			console.log(response)	
+			res.status(200).json(rest); 
+		}		
 	})
 	.catch(function(err){
 		res.status(500).json({
