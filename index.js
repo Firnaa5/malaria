@@ -16,14 +16,34 @@ app.listen(PORT, function(req, res){
 	console.log(`Server is running @ ${PORT}`);
 })
 
+//End Date Func
 var date = new Date();
 var end = format(date);
 
+// middleware to get date
+var startDate = function(req,res,next){
+	axios.get(reqUrl,{ params:{
+		query: req.query.query,
+		sort: 'P_PDATE_D asc',
+		pageSize:1,
+		synonym: true,
+		format: 'json'  }})
+	.then(function(response){
+		 req.start = response.data.resultList.result[0].firstPublicationDate;
+		 next();		
+	})
+	.catch(function(err){
+	 	res.status(500).json({
+		 	content:'Api request failed'
+		})	
+	})
+}
+app.use(startDate);
 app.get('/getWithYear', malaria);
 
 function malaria(req, res){	
 	axios.get(reqUrl,{ params:{query: req.query.query,
-		date:`( FIRST_PDATE:[${req.query.start || '1780-01-01'} TO ${req.query.end || end}])`,
+		date:`( FIRST_PDATE:[${req.query.start || req.start} TO ${req.query.end || end}])`,
 		sort: 'CITED desc',
 		pageSize:10,
 		synonym: true,
@@ -52,12 +72,6 @@ function malaria(req, res){
 		})	
 	})
 }
-
-
-
-
-
-
 //date format function
 
 function format(date) {
