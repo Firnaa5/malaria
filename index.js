@@ -18,6 +18,7 @@ app.listen(PORT, function(req, res){
 
 app.get('/getWithYear', malaria);
 
+
 function malaria(req, res){	
 		axios.get(reqUrl,{ params:{query: req.query.query,
 			date: `( FIRST_PDATE:[${req.query.start} TO ${req.query.end}])`,
@@ -46,7 +47,7 @@ function malaria(req, res){
 			 })	
 		})
 	}
-			
+
 
 
 
